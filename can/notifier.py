@@ -4,9 +4,11 @@
 This module contains the implementation of :class:`~can.Notifier`.
 """
 
-import threading
 import logging
+import threading
 import time
+
+
 try:
     import asyncio
 except ImportError:
@@ -107,6 +109,11 @@ class Notifier(object):
         if msg is not None:
             self._on_message_received(msg)
 
+        while bus._buffer:
+            msg = bus.recv(0)
+            if msg is not None:
+                self._on_message_received(msg)
+
     def _on_message_received(self, msg):
         for callback in self.listeners:
             res = callback(msg)
@@ -120,7 +127,7 @@ class Notifier(object):
                 listener.on_error(exc)
 
     def add_listener(self, listener):
-        """Add new Listener to the notification list. 
+        """Add new Listener to the notification list.
         If it is already present, it will be called two times
         each time a message arrives.
 

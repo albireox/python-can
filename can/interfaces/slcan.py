@@ -11,10 +11,11 @@ Interface for slcan compatible interfaces (win32/linux).
 
 from __future__ import absolute_import
 
-import time
 import logging
+import time
 
 from can import BusABC, Message
+
 
 logger = logging.getLogger(__name__)
 
@@ -115,6 +116,8 @@ class slcanBus(BusABC):
         # Read everything that is already available
         waiting = self.serialPortOrig.read(self.serialPortOrig.in_waiting)
         self._buffer += waiting
+
+        self._buffer = self._buffer.lstrip(self.LINE_TERMINATOR)
 
         # Check if a complete message has been received
         pos = self._buffer.find(self.LINE_TERMINATOR)
